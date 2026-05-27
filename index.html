@@ -252,29 +252,21 @@ async function init() {
 async function signIn() {
   const btn = document.getElementById('btn-login');
   btn.disabled = true;
-  btn.textContent = 'Conectando…';
+  btn.textContent = 'Redirigiendo…';
   hideLoginError();
   try {
-    const resp = await msalInstance.loginPopup({ scopes: SCOPES });
-    currentAccount = resp.account;
-    showApp();
-    loadData();
+    await msalInstance.loginRedirect({ scopes: SCOPES });
+    // La página se redirige a Microsoft — el resto ocurre en handleRedirectPromise al regresar
   } catch(e) {
     console.error('Login error:', e);
-    if (e.errorCode !== 'user_cancelled') {
-      showLoginError('Error al iniciar sesión: ' + (e.message || e.errorCode));
-    }
+    showLoginError('Error al iniciar sesión: ' + (e.message || e.errorCode));
     btn.disabled = false;
     btn.textContent = 'Iniciar sesión con Microsoft';
   }
 }
 
 function signOut() {
-  msalInstance.logoutPopup({ account: currentAccount }).then(()=>{
-    currentAccount = null;
-    rawInv=[]; rawElab=[];
-    showLogin();
-  });
+  msalInstance.logoutRedirect({ account: currentAccount });
 }
 
 async function getToken() {
@@ -283,8 +275,9 @@ async function getToken() {
     const resp = await msalInstance.acquireTokenSilent(req);
     return resp.accessToken;
   } catch(e) {
-    const resp = await msalInstance.acquireTokenPopup(req);
-    return resp.accessToken;
+    // Token silencioso falló — redirigir a Microsoft para renovar
+    await msalInstance.acquireTokenRedirect(req);
+    return null; // La página se redirige, no llega aquí
   }
 }
 
