@@ -190,7 +190,7 @@ const L_INV     = 'InventarioCT';
 const L_ELAB    = 'InventarioCTElab';
 const ACCS      = ['SmartTag','Bateria','Cargador','Beacon','Correa','Placas'];
 const FIELDS    = 'Title,CodigoBolsa,Estado,FechaIngresado,FechaElaborado,ElaboradoPor,SmartTag,Bateria,Cargador,Beacon,Correa,Placas';
-const SCOPES    = ['https://sgsvsa.sharepoint.com/AllSites.Read'];
+const SCOPES    = ['https://graph.microsoft.com/Sites.Read.All', 'https://graph.microsoft.com/User.Read'];
 
 /* ══════════════════════════════════════
    ESTADO
@@ -291,36 +291,37 @@ async function getToken() {
 /* ══════════════════════════════════════
    FETCH — Microsoft Graph API
 ══════════════════════════════════════ */
-async function fetchList(listName) {
-  const token = await getToken();
-  const base  = `https://${SITE_HOST}${SITE_PATH}/_api/web/lists/getbytitle('${encodeURIComponent(listName)}')/items`;
-  const select= `$select=${FIELDS}`;
-  let all=[], skipToken='', hasMore=true;
+// Caché del site ID para no pedirlo en cada llamada
+let _siteId = null;
+async function getSiteId(token) {
+  if (_siteId) return _siteId;
+  const r = await fetch(
+    `https://graph.microsoft.com/v1.0/sites/${SITE_HOST}:${SITE_PATH}`,
+    { headers: { 'Authorization': 'Bearer ' + token } }
+  );
+  if (!r.ok) throw new Error(`No se pudo obtener el site ID: ${r.status}`);
+  const j = await r.json();
+  _siteId = j.id;
+  return _siteId;
+}
 
-  while(hasMore) {
-    const url = base + `?${select}&$top=2000` + (skipToken ? `&$skiptoken=Paged%3dTRUE%26p_ID%3d${skipToken}` : '');
+async function fetchList(listName) {
+  const token  = await getToken();
+  const siteId = await getSiteId(token);
+  const expand = `fields($select=${FIELDS})`;
+  let all = [], url = `https://graph.microsoft.com/v1.0/sites/${siteId}/lists/${encodeURIComponent(listName)}/items?expand=${expand}&$top=999`;
+
+  while (url) {
     const r = await fetch(url, {
-      headers:{
-        'Authorization': 'Bearer ' + token,
-        'Accept': 'application/json;odata=nometadata'
-      }
+      headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
     });
-    if(!r.ok) {
-      const err = await r.json().catch(()=>({}));
-      throw new Error(`Error ${r.status} en "${listName}": ${err?.error?.message||r.statusText}`);
+    if (!r.ok) {
+      const err = await r.json().catch(() => ({}));
+      throw new Error(`Error ${r.status} en "${listName}": ${err?.error?.message || r.statusText}`);
     }
     const j = await r.json();
-    const items = j.value || [];
-    all = all.concat(items);
-    // Paginación SharePoint
-    const next = j['odata.nextLink'] || j['@odata.nextLink'];
-    if(next && items.length === 2000) {
-      const match = next.match(/p_ID%3d(\d+)/i) || next.match(/p_ID=(\d+)/i);
-      skipToken = match ? match[1] : '';
-      hasMore = !!skipToken;
-    } else {
-      hasMore = false;
-    }
+    all = all.concat((j.value || []).map(i => i.fields || i));
+    url = j['@odata.nextLink'] || null;
   }
   return all;
 }
