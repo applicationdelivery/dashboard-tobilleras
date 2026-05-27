@@ -190,7 +190,7 @@ const L_INV     = 'InventarioCT';
 const L_ELAB    = 'InventarioCTElab';
 const ACCS      = ['SmartTag','Bateria','Cargador','Beacon','Correa','Placas'];
 const FIELDS    = 'Title,CodigoBolsa,Estado,FechaIngresado,FechaElaborado,ElaboradoPor,SmartTag,Bateria,Cargador,Beacon,Correa,Placas';
-const SCOPES    = ['https://sgsvsa.sharepoint.com/.default'];
+const SCOPES    = ['https://sgsvsa.sharepoint.com/AllSites.Read'];
 
 /* ══════════════════════════════════════
    ESTADO
@@ -293,21 +293,34 @@ async function getToken() {
 ══════════════════════════════════════ */
 async function fetchList(listName) {
   const token = await getToken();
-  const base  = `https://graph.microsoft.com/v1.0/sites/${SITE_HOST}:${SITE_PATH}:/lists/${encodeURIComponent(listName)}/items`;
-  const expand= `fields($select=${FIELDS})`;
-  let all=[], url=`${base}?expand=${expand}&$top=999`;
+  const base  = `https://${SITE_HOST}${SITE_PATH}/_api/web/lists/getbytitle('${encodeURIComponent(listName)}')/items`;
+  const select= `$select=${FIELDS}`;
+  let all=[], skipToken='', hasMore=true;
 
-  while(url) {
+  while(hasMore) {
+    const url = base + `?${select}&$top=2000` + (skipToken ? `&$skiptoken=Paged%3dTRUE%26p_ID%3d${skipToken}` : '');
     const r = await fetch(url, {
-      headers:{ 'Authorization':'Bearer '+token, 'Accept':'application/json' }
+      headers:{
+        'Authorization': 'Bearer ' + token,
+        'Accept': 'application/json;odata=nometadata'
+      }
     });
     if(!r.ok) {
       const err = await r.json().catch(()=>({}));
       throw new Error(`Error ${r.status} en "${listName}": ${err?.error?.message||r.statusText}`);
     }
     const j = await r.json();
-    all = all.concat((j.value||[]).map(i=>i.fields||i));
-    url = j['@odata.nextLink'] || null;
+    const items = j.value || [];
+    all = all.concat(items);
+    // Paginación SharePoint
+    const next = j['odata.nextLink'] || j['@odata.nextLink'];
+    if(next && items.length === 2000) {
+      const match = next.match(/p_ID%3d(\d+)/i) || next.match(/p_ID=(\d+)/i);
+      skipToken = match ? match[1] : '';
+      hasMore = !!skipToken;
+    } else {
+      hasMore = false;
+    }
   }
   return all;
 }
