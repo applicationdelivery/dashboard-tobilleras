@@ -224,7 +224,7 @@ const msalConfig = {
   auth: {
     clientId: CLIENT_ID,
     authority: `https://login.microsoftonline.com/${TENANT_ID}`,
-    redirectUri: window.location.href.split('?')[0], // URI actual sin query params
+    redirectUri: 'https://applicationdelivery.github.io/dashboard-tobilleras/', // URI actual sin query params
   },
   cache: { cacheLocation: 'sessionStorage', storeAuthStateInCookie: false }
 };
