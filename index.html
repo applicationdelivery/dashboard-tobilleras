@@ -218,7 +218,7 @@ async function init() {
       authority: 'https://login.microsoftonline.com/common',
       redirectUri: REDIRECT
     },
-    cache: { cacheLocation: 'sessionStorage', storeAuthStateInCookie: false }
+    cache: { cacheLocation: 'localStorage', storeAuthStateInCookie: false }
   });
 
   // 2. Inicializar (obligatorio en MSAL v2+)
@@ -227,11 +227,22 @@ async function init() {
   // 3. Manejar respuesta de redirect si la hubiera
   try {
     const resp = await msalInstance.handleRedirectPromise();
-    if (resp) currentAccount = resp.account;
-  } catch(e) { console.warn('handleRedirectPromise:', e); }
+    console.log('handleRedirectPromise resp:', resp);
+    if (resp && resp.account) {
+      currentAccount = resp.account;
+      console.log('Login exitoso via redirect:', currentAccount.username);
+      showApp();
+      loadData();
+      return; // salir — ya estamos autenticados
+    }
+  } catch(e) {
+    console.error('handleRedirectPromise error:', e);
+    showLoginError('Error al procesar login: ' + (e.message || e.errorCode));
+  }
 
-  // 4. Revisar si ya hay sesión activa
+  // 4. Revisar si ya hay sesión activa en caché
   const accounts = msalInstance.getAllAccounts();
+  console.log('Cuentas en caché:', accounts.length);
   if (accounts.length > 0) {
     currentAccount = accounts[0];
     showApp();
