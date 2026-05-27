@@ -149,11 +149,7 @@ main{position:relative;z-index:1;padding:1.75rem 2rem;max-width:1440px;margin:0 
     <button class="f-btn active" data-p="week" onclick="setPeriod('week')">Semana</button>
     <button class="f-btn" data-p="month" onclick="setPeriod('month')">Mes</button>
     <button class="f-btn" data-p="year"  onclick="setPeriod('year')">Año</button>
-    <div class="f-sep"></div>
-    <span class="f-label">Fuente</span>
-    <button class="f-btn active" data-s="both" onclick="setSrc('both')">Ambas listas</button>
-    <button class="f-btn" data-s="inv"  onclick="setSrc('inv')">InventarioCT</button>
-    <button class="f-btn" data-s="elab" onclick="setSrc('elab')">InventarioCTElab</button>
+
   </div>
   <div class="kpi-row">
     <div class="kpi-card kpi-c-total"><div class="kpi-tag">Total registros</div><div class="kpi-val" id="k-total">—</div><div class="kpi-foot">Ambas listas</div></div>
@@ -194,14 +190,14 @@ const L_INV     = 'InventarioCT';
 const L_ELAB    = 'InventarioCTElab';
 const ACCS      = ['SmartTag','Bateria','Cargador','Beacon','Correa','Placas'];
 const FIELDS    = 'Title,CodigoBolsa,Estado,FechaIngresado,FechaElaborado,ElaboradoPor,SmartTag,Bateria,Cargador,Beacon,Correa,Placas';
-const SCOPES    = ['https://sgsvsa.sharepoint.com/Sites.Read.All','User.Read'];
+const SCOPES    = ['https://sgsvsa.sharepoint.com/.default'];
 
 /* ══════════════════════════════════════
    ESTADO
 ══════════════════════════════════════ */
 let msalInstance = null;
 let currentAccount = null;
-let rawInv=[], rawElab=[], period='week', src='both', charts={};
+let rawInv=[], rawElab=[], period='week', charts={};
 
 /* ══════════════════════════════════════
    INIT — todo arranca aquí
@@ -346,8 +342,6 @@ function renderAll() {
   renderKPIs(d); renderElab(d); renderIng(d); renderAccs(d); renderComp(d);
 }
 function getData() {
-  if(src==='inv')  return rawInv;
-  if(src==='elab') return rawElab;
   return [...rawInv,...rawElab];
 }
 
@@ -544,7 +538,7 @@ function showApp(){
   }
 }
 function setPeriod(p){period=p;document.querySelectorAll('[data-p]').forEach(b=>b.classList.toggle('active',b.dataset.p===p));renderAll();}
-function setSrc(s){src=s;document.querySelectorAll('[data-s]').forEach(b=>b.classList.toggle('active',b.dataset.s===s));renderAll();}
+
 
 /* ══════════════════════════════════════
    ARRANQUE
