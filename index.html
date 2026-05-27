@@ -19,8 +19,6 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font-b);font-size:1
 body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   background-image:linear-gradient(rgba(26,23,20,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(26,23,20,.04) 1px,transparent 1px);
   background-size:32px 32px;}
-
-/* HEADER */
 header{position:sticky;top:0;z-index:200;background:var(--ink);padding:0 2rem;
   display:flex;align-items:center;justify-content:space-between;height:58px;border-bottom:3px solid var(--accent);}
 .logo{font-family:var(--font-h);font-size:1.6rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:.5rem;}
@@ -43,8 +41,6 @@ header{position:sticky;top:0;z-index:200;background:var(--ink);padding:0 2rem;
   padding:.3rem .85rem;border-radius:2px;border:1px solid #3a3530;background:transparent;color:#a09890;cursor:pointer;transition:all .2s;}
 #btn-refresh:hover:not(:disabled){border-color:var(--accent);color:var(--accent);}
 #btn-refresh:disabled{opacity:.3;cursor:default;}
-
-/* LOGIN SCREEN */
 #login-screen{position:fixed;inset:0;z-index:500;background:var(--ink);
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2rem;}
 .ls-logo{font-family:var(--font-h);font-size:2.5rem;color:#f0ede8;letter-spacing:.1em;}
@@ -54,9 +50,10 @@ header{position:sticky;top:0;z-index:200;background:var(--ink);padding:0 2rem;
   padding:.75rem 2.5rem;border-radius:3px;border:2px solid var(--accent);
   background:transparent;color:var(--accent);cursor:pointer;transition:all .2s;}
 #btn-login:hover{background:var(--accent);color:#fff;}
+#btn-login:disabled{opacity:.5;cursor:default;}
 .ls-note{font-size:.65rem;color:#3a3530;max-width:320px;text-align:center;line-height:1.6;}
-
-/* LOADER */
+#login-error{font-size:.72rem;color:#fca5a5;max-width:360px;text-align:center;display:none;padding:.75rem 1rem;
+  border:1px solid rgba(252,165,165,.3);border-radius:3px;background:rgba(252,165,165,.05);}
 #loader{position:fixed;inset:0;z-index:400;background:var(--ink);
   display:none;flex-direction:column;align-items:center;justify-content:center;gap:1.5rem;}
 .ld-logo{font-family:var(--font-h);font-size:2rem;color:#f0ede8;letter-spacing:.1em;}
@@ -65,15 +62,9 @@ header{position:sticky;top:0;z-index:200;background:var(--ink);padding:0 2rem;
 .ld-fill{height:100%;background:var(--accent);animation:lfill 1.6s ease-in-out infinite;}
 @keyframes lfill{0%{width:0;margin-left:0}50%{width:55%;margin-left:15%}100%{width:0;margin-left:100%}}
 .ld-msg{font-size:.7rem;color:#64584e;letter-spacing:.06em;}
-
-/* MAIN */
 main{position:relative;z-index:1;padding:1.75rem 2rem;max-width:1440px;margin:0 auto;display:none;}
-
-/* ERROR */
 #err-banner{display:none;background:rgba(200,64,26,.08);border-left:3px solid var(--accent);
   padding:.85rem 1.25rem;margin-bottom:1.5rem;font-size:.78rem;color:var(--accent);border-radius:2px;}
-
-/* FILTERS */
 .filter-bar{display:flex;align-items:center;gap:.4rem;margin-bottom:1.75rem;flex-wrap:wrap;}
 .f-label{font-size:.6rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-right:.1rem;}
 .f-btn{font-family:var(--font-b);font-size:.7rem;padding:.35rem .9rem;border-radius:2px;
@@ -82,11 +73,9 @@ main{position:relative;z-index:1;padding:1.75rem 2rem;max-width:1440px;margin:0 
 .f-btn:hover{border-color:var(--ink);color:var(--ink);}
 .f-btn.active{background:var(--ink);color:#f0ede8;border-color:var(--ink);}
 .f-sep{width:1px;height:20px;background:var(--border);margin:0 .3rem;}
-
-/* KPIs */
 .kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--border);
   border:1px solid var(--border);border-radius:4px;overflow:hidden;margin-bottom:1.75rem;}
-.kpi-card{background:var(--surface);padding:1.25rem 1.5rem 1rem;position:relative;transition:background .2s;}
+.kpi-card{background:var(--surface);padding:1.25rem 1.5rem 1rem;transition:background .2s;}
 .kpi-card:hover{background:var(--surface2);}
 .kpi-tag{font-size:.6rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);
   margin-bottom:.5rem;display:flex;align-items:center;gap:.4rem;}
@@ -101,8 +90,6 @@ main{position:relative;z-index:1;padding:1.75rem 2rem;max-width:1440px;margin:0 
 .kpi-c-pend .kpi-val{color:var(--warn);}
 .kpi-c-ing  .kpi-val{color:var(--accent2);}
 .kpi-foot{font-size:.65rem;color:var(--muted);margin-top:.35rem;}
-
-/* CHARTS */
 .charts-row{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.25rem;}
 @media(max-width:860px){.charts-row{grid-template-columns:1fr;}.kpi-row{grid-template-columns:repeat(2,1fr);}}
 .c-card{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:1.25rem 1.5rem 1.5rem;}
@@ -112,8 +99,6 @@ main{position:relative;z-index:1;padding:1.75rem 2rem;max-width:1440px;margin:0 
 .c-sub{font-size:.65rem;color:var(--muted);margin-top:.2rem;text-transform:uppercase;letter-spacing:.08em;}
 .chart-wrap{position:relative;height:250px;}
 .chart-wrap-tall{position:relative;height:300px;}
-
-/* ACCESORIOS */
 .acc-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:var(--border);
   border:1px solid var(--border);border-radius:2px;overflow:hidden;margin-top:.75rem;}
 @media(max-width:860px){.acc-grid{grid-template-columns:repeat(3,1fr);}}
@@ -129,38 +114,35 @@ main{position:relative;z-index:1;padding:1.75rem 2rem;max-width:1440px;margin:0 
 </head>
 <body>
 
-<!-- LOGIN -->
 <div id="login-screen">
   <div class="ls-logo">CRITEC<span>·</span>TOBILLERAS</div>
   <div class="ls-sub">Dashboard de inventario</div>
-  <button id="btn-login" onclick="signIn()">Iniciar sesión con Microsoft</button>
-  <div class="ls-note">Use su cuenta corporativa @sgsvsa. La sesión se mantiene activa mientras use el navegador.</div>
+  <button id="btn-login">Iniciar sesión con Microsoft</button>
+  <div id="login-error"></div>
+  <div class="ls-note">Use su cuenta corporativa. La sesión se mantiene activa mientras use el navegador.</div>
 </div>
 
-<!-- LOADER -->
 <div id="loader">
   <div class="ld-logo">CRITEC<span>·</span>Tobilleras</div>
   <div class="ld-bar"><div class="ld-fill"></div></div>
   <div class="ld-msg" id="ld-msg">Cargando datos…</div>
 </div>
 
-<!-- HEADER -->
 <header>
   <div class="logo">CRITEC<span class="logo-sep">·</span>TOBILLERAS<span class="logo-sub">Dashboard de inventario</span></div>
   <div class="hdr-right">
     <div id="user-info" style="display:none">
       <span id="user-name"></span>
-      <button id="btn-logout" onclick="signOut()">Salir</button>
+      <button id="btn-logout">Salir</button>
     </div>
     <span id="last-upd"></span>
     <span id="status-pill" class="s-load">● cargando</span>
-    <button id="btn-refresh" onclick="loadData()" disabled>↻ Actualizar</button>
+    <button id="btn-refresh" disabled>↻ Actualizar</button>
   </div>
 </header>
 
 <main id="main-content">
   <div id="err-banner"></div>
-
   <div class="filter-bar">
     <span class="f-label">Período</span>
     <button class="f-btn" data-p="day"   onclick="setPeriod('day')">Día</button>
@@ -173,7 +155,6 @@ main{position:relative;z-index:1;padding:1.75rem 2rem;max-width:1440px;margin:0 
     <button class="f-btn" data-s="inv"  onclick="setSrc('inv')">InventarioCT</button>
     <button class="f-btn" data-s="elab" onclick="setSrc('elab')">InventarioCTElab</button>
   </div>
-
   <div class="kpi-row">
     <div class="kpi-card kpi-c-total"><div class="kpi-tag">Total registros</div><div class="kpi-val" id="k-total">—</div><div class="kpi-foot">Ambas listas</div></div>
     <div class="kpi-card kpi-c-elab"><div class="kpi-tag">Elaborados</div><div class="kpi-val" id="k-elab">—</div><div class="kpi-foot">Estado = Elaborado</div></div>
@@ -181,7 +162,6 @@ main{position:relative;z-index:1;padding:1.75rem 2rem;max-width:1440px;margin:0 
     <div class="kpi-card kpi-c-ing"><div class="kpi-tag">Ingresados en período</div><div class="kpi-val" id="k-ing">—</div><div class="kpi-foot" id="k-ing-foot">Esta semana</div></div>
     <div class="kpi-card kpi-c-exit"><div class="kpi-tag">Accesorios exitosos</div><div class="kpi-val" id="k-exit">—</div><div class="kpi-foot">% sobre total revisados</div></div>
   </div>
-
   <div class="charts-row">
     <div class="c-card">
       <div class="c-head"><div class="c-title">Elaborados</div><div class="c-sub" id="sub-elab">Por período · FechaElaborado</div></div>
@@ -192,12 +172,10 @@ main{position:relative;z-index:1;padding:1.75rem 2rem;max-width:1440px;margin:0 
       <div class="chart-wrap"><canvas id="ch-ing"></canvas></div>
     </div>
   </div>
-
   <div class="c-card full" style="margin-bottom:1.25rem">
     <div class="c-head"><div class="c-title">Resultado por accesorio</div><div class="c-sub">Exitosa vs Fallida · datos combinados</div></div>
     <div class="acc-grid" id="acc-grid"></div>
   </div>
-
   <div class="c-card full">
     <div class="c-head"><div class="c-title">Comparativo ingresados vs elaborados</div><div class="c-sub" id="sub-comp">Evolución en el período</div></div>
     <div class="chart-wrap-tall"><canvas id="ch-comp"></canvas></div>
@@ -208,46 +186,47 @@ main{position:relative;z-index:1;padding:1.75rem 2rem;max-width:1440px;margin:0 
 /* ══════════════════════════════════════
    CONFIGURACIÓN
 ══════════════════════════════════════ */
-const CLIENT_ID  = '0c41647e-99b4-4736-8702-4f72d94bc0f2';
-const TENANT_ID  = 'common'; // inquilino único — se resuelve solo con la cuenta corporativa
-const SITE_HOST  = 'sgsvsa.sharepoint.com';
-const SITE_PATH  = '/sites/CRITEC-Tobilleras';
-const L_INV      = 'InventarioCT';
-const L_ELAB     = 'InventarioCTElab';
-const ACCS       = ['SmartTag','Bateria','Cargador','Beacon','Correa','Placas'];
-const FIELDS     = 'Title,CodigoBolsa,Estado,FechaIngresado,FechaElaborado,ElaboradoPor,SmartTag,Bateria,Cargador,Beacon,Correa,Placas';
+const CLIENT_ID = '0c41647e-99b4-4736-8702-4f72d94bc0f2';
+const REDIRECT  = 'https://applicationdelivery.github.io/dashboard-tobilleras/';
+const SITE_HOST = 'sgsvsa.sharepoint.com';
+const SITE_PATH = '/sites/CRITEC-Tobilleras';
+const L_INV     = 'InventarioCT';
+const L_ELAB    = 'InventarioCTElab';
+const ACCS      = ['SmartTag','Bateria','Cargador','Beacon','Correa','Placas'];
+const FIELDS    = 'Title,CodigoBolsa,Estado,FechaIngresado,FechaElaborado,ElaboradoPor,SmartTag,Bateria,Cargador,Beacon,Correa,Placas';
+const SCOPES    = ['https://sgsvsa.sharepoint.com/Sites.Read.All','User.Read'];
 
 /* ══════════════════════════════════════
-   MSAL
+   ESTADO
 ══════════════════════════════════════ */
-const msalConfig = {
-  auth: {
-    clientId: CLIENT_ID,
-    authority: `https://login.microsoftonline.com/${TENANT_ID}`,
-    redirectUri: 'https://applicationdelivery.github.io/dashboard-tobilleras/', // URI actual sin query params
-  },
-  cache: { cacheLocation: 'sessionStorage', storeAuthStateInCookie: false }
-};
-
-const msalInstance = new msal.PublicClientApplication(msalConfig);
-
-const SCOPES = [
-  'https://sgsvsa.sharepoint.com/Sites.Read.All',
-  'User.Read'
-];
-
+let msalInstance = null;
 let currentAccount = null;
+let rawInv=[], rawElab=[], period='week', src='both', charts={};
 
-async function initAuth() {
+/* ══════════════════════════════════════
+   INIT — todo arranca aquí
+══════════════════════════════════════ */
+async function init() {
+  // 1. Crear instancia MSAL
+  msalInstance = new msal.PublicClientApplication({
+    auth: {
+      clientId: CLIENT_ID,
+      authority: 'https://login.microsoftonline.com/common',
+      redirectUri: REDIRECT
+    },
+    cache: { cacheLocation: 'sessionStorage', storeAuthStateInCookie: false }
+  });
+
+  // 2. Inicializar (obligatorio en MSAL v2+)
   await msalInstance.initialize();
 
-  // Manejar redirect de vuelta
+  // 3. Manejar respuesta de redirect si la hubiera
   try {
     const resp = await msalInstance.handleRedirectPromise();
     if (resp) currentAccount = resp.account;
-  } catch(e) { console.error('Redirect error:', e); }
+  } catch(e) { console.warn('handleRedirectPromise:', e); }
 
-  // Revisar si ya hay sesión
+  // 4. Revisar si ya hay sesión activa
   const accounts = msalInstance.getAllAccounts();
   if (accounts.length > 0) {
     currentAccount = accounts[0];
@@ -256,9 +235,21 @@ async function initAuth() {
   } else {
     showLogin();
   }
+
+  // 5. Asignar eventos a botones (después de que MSAL está listo)
+  document.getElementById('btn-login').addEventListener('click', signIn);
+  document.getElementById('btn-logout').addEventListener('click', signOut);
+  document.getElementById('btn-refresh').addEventListener('click', loadData);
 }
 
+/* ══════════════════════════════════════
+   AUTH
+══════════════════════════════════════ */
 async function signIn() {
+  const btn = document.getElementById('btn-login');
+  btn.disabled = true;
+  btn.textContent = 'Conectando…';
+  hideLoginError();
   try {
     const resp = await msalInstance.loginPopup({ scopes: SCOPES });
     currentAccount = resp.account;
@@ -267,15 +258,19 @@ async function signIn() {
   } catch(e) {
     console.error('Login error:', e);
     if (e.errorCode !== 'user_cancelled') {
-      alert('Error al iniciar sesión: ' + e.message);
+      showLoginError('Error al iniciar sesión: ' + (e.message || e.errorCode));
     }
+    btn.disabled = false;
+    btn.textContent = 'Iniciar sesión con Microsoft';
   }
 }
 
 function signOut() {
-  msalInstance.logoutPopup({ account: currentAccount });
-  currentAccount = null;
-  showLogin();
+  msalInstance.logoutPopup({ account: currentAccount }).then(()=>{
+    currentAccount = null;
+    rawInv=[]; rawElab=[];
+    showLogin();
+  });
 }
 
 async function getToken() {
@@ -284,41 +279,34 @@ async function getToken() {
     const resp = await msalInstance.acquireTokenSilent(req);
     return resp.accessToken;
   } catch(e) {
-    // Si el token silencioso falla, pedir con popup
     const resp = await msalInstance.acquireTokenPopup(req);
     return resp.accessToken;
   }
 }
 
 /* ══════════════════════════════════════
-   GRAPH API — SharePoint REST via Graph
+   FETCH — Microsoft Graph API
 ══════════════════════════════════════ */
 async function fetchList(listName) {
   const token = await getToken();
   const base  = `https://graph.microsoft.com/v1.0/sites/${SITE_HOST}:${SITE_PATH}:/lists/${encodeURIComponent(listName)}/items`;
-  const select= `fields($select=${FIELDS})`;
-  let   all   = [], url = `${base}?expand=${select}&$top=999`;
+  const expand= `fields($select=${FIELDS})`;
+  let all=[], url=`${base}?expand=${expand}&$top=999`;
 
-  while (url) {
+  while(url) {
     const r = await fetch(url, {
-      headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
+      headers:{ 'Authorization':'Bearer '+token, 'Accept':'application/json' }
     });
-    if (!r.ok) {
+    if(!r.ok) {
       const err = await r.json().catch(()=>({}));
-      throw new Error(`Error ${r.status} en lista "${listName}": ${err?.error?.message||r.statusText}`);
+      throw new Error(`Error ${r.status} en "${listName}": ${err?.error?.message||r.statusText}`);
     }
     const j = await r.json();
-    // Graph devuelve los campos dentro de .fields
-    all = all.concat((j.value||[]).map(i => i.fields||i));
+    all = all.concat((j.value||[]).map(i=>i.fields||i));
     url = j['@odata.nextLink'] || null;
   }
   return all;
 }
-
-/* ══════════════════════════════════════
-   ESTADO
-══════════════════════════════════════ */
-let rawInv=[], rawElab=[], period='week', src='both', charts={};
 
 /* ══════════════════════════════════════
    CARGA
@@ -334,11 +322,11 @@ async function loadData() {
     renderAll();
     setStatus('ok','● conectado');
     document.getElementById('last-upd').textContent =
-      'Actualizado: ' + new Date().toLocaleTimeString('es-CR');
+      'Actualizado: '+new Date().toLocaleTimeString('es-CR');
   } catch(e) {
     console.error(e);
     setStatus('err','● error');
-    showErr('No se pudieron cargar los datos: ' + e.message);
+    showErr('No se pudieron cargar los datos: '+e.message);
   } finally { setBusy(false); }
 }
 
@@ -346,50 +334,50 @@ async function loadData() {
    RENDER
 ══════════════════════════════════════ */
 function renderAll() {
-  const d = getData();
+  const d=getData();
   renderKPIs(d); renderElab(d); renderIng(d); renderAccs(d); renderComp(d);
 }
 function getData() {
-  if (src==='inv')  return rawInv;
-  if (src==='elab') return rawElab;
+  if(src==='inv')  return rawInv;
+  if(src==='elab') return rawElab;
   return [...rawInv,...rawElab];
 }
 
 function renderKPIs(d) {
-  const elab = d.filter(x=>x.Estado==='Elaborado').length;
-  const pend = d.filter(x=>x.Estado==='Pendiente').length;
-  const rng  = range(period);
-  const ing  = d.filter(x=>{ const f=pd(x.FechaIngresado); return f&&f>=rng.s&&f<rng.e; }).length;
-  let ok=0, tot=0;
-  d.forEach(x=>ACCS.forEach(a=>{ if(x[a]){tot++; if(x[a]==='Exitosa')ok++; } }));
-  const pct = tot ? Math.round(ok/tot*100) : 0;
-  num('k-total', d.length); num('k-elab', elab); num('k-pend', pend); num('k-ing', ing);
-  document.getElementById('k-exit').textContent = pct+'%';
-  const lbl = {day:'Hoy',week:'Esta semana',month:'Este mes',year:'Este año'};
-  document.getElementById('k-ing-foot').textContent = lbl[period];
+  const elab=d.filter(x=>x.Estado==='Elaborado').length;
+  const pend=d.filter(x=>x.Estado==='Pendiente').length;
+  const rng=range(period);
+  const ing=d.filter(x=>{const f=pd(x.FechaIngresado);return f&&f>=rng.s&&f<rng.e;}).length;
+  let ok=0,tot=0;
+  d.forEach(x=>ACCS.forEach(a=>{if(x[a]){tot++;if(x[a]==='Exitosa')ok++;}}));
+  const pct=tot?Math.round(ok/tot*100):0;
+  num('k-total',d.length); num('k-elab',elab); num('k-pend',pend); num('k-ing',ing);
+  document.getElementById('k-exit').textContent=pct+'%';
+  const lbl={day:'Hoy',week:'Esta semana',month:'Este mes',year:'Este año'};
+  document.getElementById('k-ing-foot').textContent=lbl[period];
 }
 
 function renderElab(d) {
-  const {labels,counts} = group(d,'FechaElaborado',period);
-  const sub = {day:'Por hora · hoy',week:'Por día · semana actual',month:'Por día · mes actual',year:'Por mes · año actual'};
-  document.getElementById('sub-elab').textContent = sub[period];
+  const {labels,counts}=group(d,'FechaElaborado',period);
+  const sub={day:'Por hora · hoy',week:'Por día · semana actual',month:'Por día · mes actual',year:'Por mes · año actual'};
+  document.getElementById('sub-elab').textContent=sub[period];
   mkBar('ch-elab',labels,counts,'Elaborados','#1a7a4a','rgba(26,122,74,.15)');
 }
 
 function renderIng(d) {
-  const {labels,counts} = group(d,'FechaIngresado',period);
-  const sub = {day:'Por hora · hoy',week:'Por día · semana actual',month:'Por día · mes actual',year:'Por mes · año actual'};
-  document.getElementById('sub-ing').textContent = sub[period];
+  const {labels,counts}=group(d,'FechaIngresado',period);
+  const sub={day:'Por hora · hoy',week:'Por día · semana actual',month:'Por día · mes actual',year:'Por mes · año actual'};
+  document.getElementById('sub-ing').textContent=sub[period];
   mkBar('ch-ing',labels,counts,'Ingresados','#1a5fc8','rgba(26,95,200,.15)');
 }
 
 function renderComp(d) {
-  const {labels,counts:ce} = group(d,'FechaElaborado',period);
-  const {counts:ci}        = group(d,'FechaIngresado',period);
-  const sub = {day:'Por hora · hoy',week:'Por día · semana',month:'Por día · mes',year:'Por mes · año'};
-  document.getElementById('sub-comp').textContent = sub[period];
+  const {labels,counts:ce}=group(d,'FechaElaborado',period);
+  const {counts:ci}=group(d,'FechaIngresado',period);
+  const sub={day:'Por hora · hoy',week:'Por día · semana',month:'Por día · mes',year:'Por mes · año'};
+  document.getElementById('sub-comp').textContent=sub[period];
   kill('ch-comp');
-  charts['ch-comp'] = new Chart(document.getElementById('ch-comp').getContext('2d'),{
+  charts['ch-comp']=new Chart(document.getElementById('ch-comp').getContext('2d'),{
     type:'line',
     data:{labels,datasets:[
       {label:'Ingresados',data:ci,borderColor:'#1a5fc8',backgroundColor:'rgba(26,95,200,.07)',
@@ -402,18 +390,18 @@ function renderComp(d) {
 }
 
 function renderAccs(d) {
-  const g = document.getElementById('acc-grid');
-  g.innerHTML = '';
-  ACCS.forEach(a=>{ const k='donut-'+a; if(charts[k]){charts[k].destroy();delete charts[k];} });
+  const g=document.getElementById('acc-grid');
+  g.innerHTML='';
+  ACCS.forEach(a=>{const k='donut-'+a;if(charts[k]){charts[k].destroy();delete charts[k];}});
   ACCS.forEach(a=>{
-    const items = d.filter(x=>x[a]);
-    const ok    = items.filter(x=>x[a]==='Exitosa').length;
-    const fail  = items.filter(x=>x[a]==='Fallida').length;
-    const tot   = ok+fail;
-    const pct   = tot ? Math.round(ok/tot*100) : 0;
-    const div   = document.createElement('div');
-    div.className = 'acc-item';
-    div.innerHTML = `
+    const items=d.filter(x=>x[a]);
+    const ok=items.filter(x=>x[a]==='Exitosa').length;
+    const fail=items.filter(x=>x[a]==='Fallida').length;
+    const tot=ok+fail;
+    const pct=tot?Math.round(ok/tot*100):0;
+    const div=document.createElement('div');
+    div.className='acc-item';
+    div.innerHTML=`
       <div class="acc-name">${a}</div>
       <div class="acc-donut">
         <canvas id="donut-${a}" width="64" height="64"></canvas>
@@ -424,11 +412,11 @@ function renderAccs(d) {
         <span style="color:var(--fail)">${fail} fail</span>
       </div>`;
     g.appendChild(div);
-    charts['donut-'+a] = new Chart(document.getElementById('donut-'+a).getContext('2d'),{
+    charts['donut-'+a]=new Chart(document.getElementById('donut-'+a).getContext('2d'),{
       type:'doughnut',
       data:{datasets:[{
-        data: tot?[ok,fail]:[1,0],
-        backgroundColor: tot?['#1a7a4a','#c8401a']:['#ddd8d0','#ddd8d0'],
+        data:tot?[ok,fail]:[1,0],
+        backgroundColor:tot?['#1a7a4a','#c8401a']:['#ddd8d0','#ddd8d0'],
         borderWidth:0
       }]},
       options:{cutout:'72%',animation:{duration:600},plugins:{legend:{display:false},tooltip:{enabled:false}}}
@@ -441,7 +429,7 @@ function renderAccs(d) {
 ══════════════════════════════════════ */
 function mkBar(id,labels,counts,label,color,bg) {
   kill(id);
-  charts[id] = new Chart(document.getElementById(id).getContext('2d'),{
+  charts[id]=new Chart(document.getElementById(id).getContext('2d'),{
     type:'bar',
     data:{labels,datasets:[{label,data:counts,backgroundColor:bg,borderColor:color,
       borderWidth:2,borderRadius:4,borderSkipped:false}]},
@@ -450,7 +438,7 @@ function mkBar(id,labels,counts,label,color,bg) {
 }
 function opts(legend=false) {
   return {
-    responsive:true, maintainAspectRatio:false,
+    responsive:true,maintainAspectRatio:false,
     animation:{duration:500,easing:'easeOutQuart'},
     plugins:{
       legend:{display:legend,labels:{color:'#8a847c',font:{family:'IBM Plex Mono',size:11},boxWidth:10}},
@@ -465,23 +453,23 @@ function opts(legend=false) {
     }
   };
 }
-function kill(id){ if(charts[id]){charts[id].destroy();delete charts[id];} }
+function kill(id){if(charts[id]){charts[id].destroy();delete charts[id];}}
 
 /* ══════════════════════════════════════
    AGRUPACIÓN
 ══════════════════════════════════════ */
 function group(data,field,p) {
-  const rng = range(p);
-  const filtered = data.filter(d=>{ const f=pd(d[field]); return f&&f>=rng.s&&f<rng.e; });
-  let labels=[], buckets={};
-  if (p==='day') {
+  const rng=range(p);
+  const filtered=data.filter(d=>{const f=pd(d[field]);return f&&f>=rng.s&&f<rng.e;});
+  let labels=[],buckets={};
+  if(p==='day'){
     for(let h=0;h<24;h++){const k=pad(h)+':00';labels.push(k);buckets[k]=0;}
     filtered.forEach(d=>{const f=pd(d[field]);if(f){const k=pad(f.getHours())+':00';buckets[k]++;}});
-  } else if (p==='week') {
+  } else if(p==='week'){
     const dn=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
     for(let i=0;i<7;i++){const dd=new Date(rng.s);dd.setDate(dd.getDate()+i);const k=dn[i]+' '+dd.getDate();labels.push(k);buckets[k]=0;}
     filtered.forEach(d=>{const f=pd(d[field]);if(!f)return;const diff=Math.floor((f-rng.s)/86400000);if(diff>=0&&diff<7)buckets[labels[diff]]++;});
-  } else if (p==='month') {
+  } else if(p==='month'){
     const dim=new Date(rng.e.getFullYear(),rng.e.getMonth(),0).getDate();
     for(let i=1;i<=dim;i++){const k=String(i);labels.push(k);buckets[k]=0;}
     filtered.forEach(d=>{const f=pd(d[field]);if(f)buckets[String(f.getDate())]++;});
@@ -490,26 +478,26 @@ function group(data,field,p) {
     mn.forEach(m=>{labels.push(m);buckets[m]=0;});
     filtered.forEach(d=>{const f=pd(d[field]);if(f)buckets[mn[f.getMonth()]]++;});
   }
-  return {labels,counts:labels.map(l=>buckets[l]||0)};
+  return{labels,counts:labels.map(l=>buckets[l]||0)};
 }
 
 function range(p) {
-  const now=new Date(); let s,e;
-  if (p==='day'){
+  const now=new Date();let s,e;
+  if(p==='day'){
     s=new Date(now.getFullYear(),now.getMonth(),now.getDate());
     e=new Date(s);e.setDate(e.getDate()+1);
-  } else if (p==='week'){
+  } else if(p==='week'){
     const day=now.getDay(),diff=day===0?-6:1-day;
     s=new Date(now.getFullYear(),now.getMonth(),now.getDate()+diff);
     e=new Date(s);e.setDate(e.getDate()+7);
-  } else if (p==='month'){
+  } else if(p==='month'){
     s=new Date(now.getFullYear(),now.getMonth(),1);
     e=new Date(now.getFullYear(),now.getMonth()+1,1);
   } else {
     s=new Date(now.getFullYear(),0,1);
     e=new Date(now.getFullYear()+1,0,1);
   }
-  return {s,e};
+  return{s,e};
 }
 const pd=v=>{if(!v)return null;const d=new Date(v);return isNaN(d)?null:d;};
 const pad=n=>String(n).padStart(2,'0');
@@ -517,7 +505,7 @@ const pad=n=>String(n).padStart(2,'0');
 /* ══════════════════════════════════════
    UI HELPERS
 ══════════════════════════════════════ */
-function num(id,target) {
+function num(id,target){
   const el=document.getElementById(id);
   const start=parseInt(el.textContent.replace(/\D/g,''))||0;
   const t0=performance.now();
@@ -531,7 +519,14 @@ function setBusy(v){document.getElementById('loader').style.display=v?'flex':'no
 function setLdMsg(m){document.getElementById('ld-msg').textContent=m;}
 function showErr(m){const e=document.getElementById('err-banner');e.textContent=m;e.style.display='block';}
 function hideErr(){document.getElementById('err-banner').style.display='none';}
-function showLogin(){document.getElementById('login-screen').style.display='flex';document.getElementById('main-content').style.display='none';}
+function showLoginError(m){const e=document.getElementById('login-error');e.textContent=m;e.style.display='block';}
+function hideLoginError(){document.getElementById('login-error').style.display='none';}
+function showLogin(){
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('main-content').style.display='none';
+  const btn=document.getElementById('btn-login');
+  btn.disabled=false; btn.textContent='Iniciar sesión con Microsoft';
+}
 function showApp(){
   document.getElementById('login-screen').style.display='none';
   document.getElementById('main-content').style.display='block';
@@ -544,10 +539,10 @@ function setPeriod(p){period=p;document.querySelectorAll('[data-p]').forEach(b=>
 function setSrc(s){src=s;document.querySelectorAll('[data-s]').forEach(b=>b.classList.toggle('active',b.dataset.s===s));renderAll();}
 
 /* ══════════════════════════════════════
-   INICIO
+   ARRANQUE
 ══════════════════════════════════════ */
 window.addEventListener('DOMContentLoaded', ()=>{
-  initAuth();
+  init().catch(e=>{ console.error('Init error:',e); showLoginError('Error al inicializar: '+e.message); });
   setInterval(()=>{ if(currentAccount) loadData(); }, 5*60*1000);
 });
 </script>
