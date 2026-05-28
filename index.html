@@ -110,6 +110,9 @@ main{position:relative;z-index:1;padding:1.75rem 2rem;max-width:1440px;margin:0 
 .acc-pct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
   font-family:var(--font-h);font-size:1rem;letter-spacing:.02em;}
 .acc-counts{font-size:.65rem;color:var(--muted);}
+.user-legend{display:flex;flex-wrap:wrap;gap:.5rem .85rem;margin-top:1rem;justify-content:center;}
+.user-legend-item{display:flex;align-items:center;gap:.35rem;font-size:.7rem;color:var(--muted);}
+.user-legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
 </style>
 </head>
 <body>
@@ -145,7 +148,6 @@ main{position:relative;z-index:1;padding:1.75rem 2rem;max-width:1440px;margin:0 
   <div id="err-banner"></div>
   <div class="filter-bar">
     <span class="f-label">Período</span>
-    <button class="f-btn" data-p="day"   onclick="setPeriod('day')">Día</button>
     <button class="f-btn active" data-p="week" onclick="setPeriod('week')">Semana</button>
     <button class="f-btn" data-p="month" onclick="setPeriod('month')">Mes</button>
     <button class="f-btn" data-p="year"  onclick="setPeriod('year')">Año</button>
@@ -176,6 +178,20 @@ main{position:relative;z-index:1;padding:1.75rem 2rem;max-width:1440px;margin:0 
     <div class="c-head"><div class="c-title">Comparativo ingresados vs elaborados</div><div class="c-sub" id="sub-comp">Evolución en el período</div></div>
     <div class="chart-wrap-tall"><canvas id="ch-comp"></canvas></div>
   </div>
+
+  <div class="c-card full" style="margin-top:1.25rem">
+    <div class="c-head"><div class="c-title">Elaborados por usuario</div><div class="c-sub">Distribución del equipo · ElaboradoPor</div></div>
+    <div style="display:flex;align-items:center;justify-content:center;gap:3rem;flex-wrap:wrap;padding:.5rem 0">
+      <div style="position:relative;width:220px;height:220px;flex-shrink:0">
+        <canvas id="ch-usuarios"></canvas>
+        <div id="ch-usuarios-total" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none">
+          <span style="font-family:var(--font-h);font-size:2rem;line-height:1" id="u-total-num">—</span>
+          <span style="font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">elaborados</span>
+        </div>
+      </div>
+      <div class="user-legend" id="user-legend" style="max-width:500px"></div>
+    </div>
+  </div>
 </main>
 
 <script>
@@ -189,7 +205,7 @@ const SITE_PATH = '/sites/CRITEC-Tobilleras';
 const L_INV     = 'InventarioCT';
 const L_ELAB    = 'InventarioCTElab';
 const ACCS      = ['SmartTag','Bateria','Cargador','Beacon','Correa','Placas'];
-const FIELDS    = 'Title,CodigoBolsa,Estado,FechaIngresado,FechaElaborado,ElaboradoPor,SmartTag,Bateria,Cargador,Beacon,Correa,Placas';
+const FIELDS    = 'Title,Estado,FechaIngreso0,FechaElaborado,ElaboradoPor,SmartTag,Bateria,Cargador,Beacon,Correa,Placas';
 const SCOPES    = ['https://graph.microsoft.com/Sites.Read.All', 'https://graph.microsoft.com/User.Read'];
 
 /* ══════════════════════════════════════
@@ -353,7 +369,7 @@ async function loadData() {
 ══════════════════════════════════════ */
 function renderAll() {
   const d=getData();
-  renderKPIs(d); renderElab(d); renderIng(d); renderAccs(d); renderComp(d);
+  renderKPIs(d); renderElab(d); renderIng(d); renderAccs(d); renderComp(d); renderUsuarios(d);
 }
 function getData() {
   return [...rawInv,...rawElab];
@@ -381,7 +397,7 @@ function renderElab(d) {
 }
 
 function renderIng(d) {
-  const {labels,counts}=group(d,'FechaIngresado',period);
+  const {labels,counts}=group(d,'FechaIngreso0',period);
   const sub={day:'Por hora · hoy',week:'Por día · semana actual',month:'Por día · mes actual',year:'Por mes · año actual'};
   document.getElementById('sub-ing').textContent=sub[period];
   mkBar('ch-ing',labels,counts,'Ingresados','#1a5fc8','rgba(26,95,200,.15)');
@@ -389,7 +405,7 @@ function renderIng(d) {
 
 function renderComp(d) {
   const {labels,counts:ce}=group(d,'FechaElaborado',period);
-  const {counts:ci}=group(d,'FechaIngresado',period);
+  const {counts:ci}=group(d,'FechaIngreso0',period);
   const sub={day:'Por hora · hoy',week:'Por día · semana',month:'Por día · mes',year:'Por mes · año'};
   document.getElementById('sub-comp').textContent=sub[period];
   kill('ch-comp');
@@ -437,6 +453,79 @@ function renderAccs(d) {
       }]},
       options:{cutout:'72%',animation:{duration:600},plugins:{legend:{display:false},tooltip:{enabled:false}}}
     });
+  });
+}
+
+
+/* ══════════════════════════════════════
+   CHART USUARIOS
+══════════════════════════════════════ */
+const USER_PALETTE = ['#1a7a4a','#1a5fc8','#c8401a','#7c3aed','#b8720a',
+  '#0e7490','#be185d','#15803d','#b45309','#6d28d9','#0369a1','#b91c1c'];
+
+function renderUsuarios(d) {
+  // Solo registros elaborados con ElaboradoPor definido
+  const elaborados = d.filter(x => x.Estado === 'Elaborado' && x.ElaboradoPor);
+  const counts = {};
+  elaborados.forEach(x => {
+    const u = x.ElaboradoPor.trim();
+    counts[u] = (counts[u] || 0) + 1;
+  });
+  const users  = Object.keys(counts).sort((a,b) => counts[b]-counts[a]);
+  const values = users.map(u => counts[u]);
+  const total  = values.reduce((a,b)=>a+b, 0);
+  const colors = users.map((_,i) => USER_PALETTE[i % USER_PALETTE.length]);
+
+  // Total en centro
+  document.getElementById('u-total-num').textContent = total.toLocaleString('es-CR');
+
+  // Leyenda
+  const leg = document.getElementById('user-legend');
+  leg.innerHTML = '';
+  users.forEach((u,i) => {
+    const pct = total ? Math.round(counts[u]/total*100) : 0;
+    const item = document.createElement('div');
+    item.className = 'user-legend-item';
+    item.innerHTML = `<div class="user-legend-dot" style="background:${colors[i]}"></div>
+      <span><b style="color:var(--ink)">${u}</b> — ${counts[u]} (${pct}%)</span>`;
+    leg.appendChild(item);
+  });
+
+  // Dona
+  kill('ch-usuarios');
+  if (!total) return;
+  charts['ch-usuarios'] = new Chart(document.getElementById('ch-usuarios').getContext('2d'), {
+    type: 'doughnut',
+    data: {
+      labels: users,
+      datasets: [{
+        data: values,
+        backgroundColor: colors,
+        borderWidth: 2,
+        borderColor: '#ffffff',
+        hoverOffset: 6
+      }]
+    },
+    options: {
+      cutout: '68%',
+      animation: { duration: 700 },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#fff', borderColor: '#ddd8d0', borderWidth: 1,
+          titleColor: '#1a1714', bodyColor: '#8a847c',
+          titleFont: { family: 'IBM Plex Mono', size: 11 },
+          bodyFont:  { family: 'IBM Plex Mono', size: 10 },
+          padding: 10, cornerRadius: 2,
+          callbacks: {
+            label: ctx => {
+              const pct = total ? Math.round(ctx.parsed/total*100) : 0;
+              return ` ${ctx.parsed} elaborados (${pct}%)`;
+            }
+          }
+        }
+      }
+    }
   });
 }
 
@@ -551,7 +640,7 @@ function showApp(){
     document.getElementById('user-name').textContent=currentAccount.name||currentAccount.username;
   }
 }
-function setPeriod(p){period=p;document.querySelectorAll('[data-p]').forEach(b=>b.classList.toggle('active',b.dataset.p===p));renderAll();}
+function setPeriod(p){if(p==='day')return;period=p;document.querySelectorAll('[data-p]').forEach(b=>b.classList.toggle('active',b.dataset.p===p));renderAll();}
 
 
 /* ══════════════════════════════════════
