@@ -166,7 +166,7 @@ main{position:relative;z-index:1;padding:1.75rem 2rem;max-width:1440px;margin:0 
       <div class="chart-wrap"><canvas id="ch-elab"></canvas></div>
     </div>
     <div class="c-card">
-      <div class="c-head"><div class="c-title">Ingresados</div><div class="c-sub" id="sub-ing">Por período · FechaIngresado</div></div>
+      <div class="c-head"><div class="c-title">Ingresados</div><div class="c-sub" id="sub-ing">Por período · FechaIngreso0</div></div>
       <div class="chart-wrap"><canvas id="ch-ing"></canvas></div>
     </div>
   </div>
@@ -379,7 +379,7 @@ function renderKPIs(d) {
   const elab=d.filter(x=>x.Estado==='Elaborado').length;
   const pend=d.filter(x=>x.Estado==='Pendiente').length;
   const rng=range(period);
-  const ing=d.filter(x=>{const f=pd(x.FechaIngresado);return f&&f>=rng.s&&f<rng.e;}).length;
+  const ing=d.filter(x=>{const f=pd(x.FechaIngreso0);return f&&f>=rng.s&&f<rng.e;}).length;
   let ok=0,tot=0;
   d.forEach(x=>ACCS.forEach(a=>{if(x[a]){tot++;if(x[a]==='Exitosa')ok++;}}));
   const pct=tot?Math.round(ok/tot*100):0;
