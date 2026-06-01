@@ -113,6 +113,15 @@ main{position:relative;z-index:1;padding:1.75rem 2rem;max-width:1440px;margin:0 
 .user-legend{display:flex;flex-wrap:wrap;gap:.5rem .85rem;margin-top:1rem;justify-content:center;}
 .user-legend-item{display:flex;align-items:center;gap:.35rem;font-size:.7rem;color:var(--muted);}
 .user-legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.nav-bar{display:flex;align-items:center;gap:.5rem;}
+.nav-btn{font-family:var(--font-b);font-size:.8rem;width:26px;height:26px;
+  border-radius:2px;border:1px solid var(--border);background:var(--surface);
+  color:var(--muted);cursor:pointer;transition:all .15s;
+  display:flex;align-items:center;justify-content:center;line-height:1;}
+.nav-btn:hover{border-color:var(--ink);color:var(--ink);}
+.nav-btn:disabled{opacity:.3;cursor:default;}
+#nav-label{font-size:.72rem;color:var(--ink);min-width:140px;text-align:center;
+  font-family:var(--font-b);letter-spacing:.02em;}
 </style>
 </head>
 <body>
@@ -151,7 +160,12 @@ main{position:relative;z-index:1;padding:1.75rem 2rem;max-width:1440px;margin:0 
     <button class="f-btn active" data-p="week" onclick="setPeriod('week')">Semana</button>
     <button class="f-btn" data-p="month" onclick="setPeriod('month')">Mes</button>
     <button class="f-btn" data-p="year"  onclick="setPeriod('year')">Año</button>
-
+    <div class="f-sep"></div>
+    <div class="nav-bar">
+      <button class="nav-btn" id="btn-prev" onclick="navigate(-1)">&#8592;</button>
+      <span id="nav-label">—</span>
+      <button class="nav-btn" id="btn-next" onclick="navigate(1)" disabled>&#8594;</button>
+    </div>
   </div>
   <div class="kpi-row">
     <div class="kpi-card kpi-c-total"><div class="kpi-tag">Total registros</div><div class="kpi-val" id="k-total">—</div><div class="kpi-foot">Ambas listas</div></div>
@@ -166,7 +180,7 @@ main{position:relative;z-index:1;padding:1.75rem 2rem;max-width:1440px;margin:0 
       <div class="chart-wrap"><canvas id="ch-elab"></canvas></div>
     </div>
     <div class="c-card">
-      <div class="c-head"><div class="c-title">Ingresados</div><div class="c-sub" id="sub-ing">Por período · FechaIngreso0</div></div>
+      <div class="c-head"><div class="c-title">Ingresados</div><div class="c-sub" id="sub-ing">Por período · FechaIngresado</div></div>
       <div class="chart-wrap"><canvas id="ch-ing"></canvas></div>
     </div>
   </div>
@@ -213,7 +227,7 @@ const SCOPES    = ['https://graph.microsoft.com/Sites.Read.All', 'https://graph.
 ══════════════════════════════════════ */
 let msalInstance = null;
 let currentAccount = null;
-let rawInv=[], rawElab=[], period='week', charts={};
+let rawInv=[], rawElab=[], period='week', offset=0, charts={};
 
 /* ══════════════════════════════════════
    INIT — todo arranca aquí
@@ -379,7 +393,7 @@ function renderKPIs(d) {
   const elab=d.filter(x=>x.Estado==='Elaborado').length;
   const pend=d.filter(x=>x.Estado==='Pendiente').length;
   const rng=range(period);
-  const ing=d.filter(x=>{const f=pd(x.FechaIngreso0);return f&&f>=rng.s&&f<rng.e;}).length;
+  const ing=d.filter(x=>{const f=pd(x.FechaIngresado);return f&&f>=rng.s&&f<rng.e;}).length;
   let ok=0,tot=0;
   d.forEach(x=>ACCS.forEach(a=>{if(x[a]){tot++;if(x[a]==='Exitosa')ok++;}}));
   const pct=tot?Math.round(ok/tot*100):0;
@@ -587,22 +601,44 @@ function group(data,field,p) {
 }
 
 function range(p) {
-  const now=new Date();let s,e;
-  if(p==='day'){
-    s=new Date(now.getFullYear(),now.getMonth(),now.getDate());
-    e=new Date(s);e.setDate(e.getDate()+1);
-  } else if(p==='week'){
-    const day=now.getDay(),diff=day===0?-6:1-day;
-    s=new Date(now.getFullYear(),now.getMonth(),now.getDate()+diff);
-    e=new Date(s);e.setDate(e.getDate()+7);
+  const now=new Date(); let s,e;
+  if(p==='week'){
+    const day=now.getDay(), diff=day===0?-6:1-day;
+    s=new Date(now.getFullYear(),now.getMonth(),now.getDate()+diff + offset*7);
+    e=new Date(s); e.setDate(e.getDate()+7);
   } else if(p==='month'){
-    s=new Date(now.getFullYear(),now.getMonth(),1);
-    e=new Date(now.getFullYear(),now.getMonth()+1,1);
+    s=new Date(now.getFullYear(), now.getMonth()+offset, 1);
+    e=new Date(now.getFullYear(), now.getMonth()+offset+1, 1);
   } else {
-    s=new Date(now.getFullYear(),0,1);
-    e=new Date(now.getFullYear()+1,0,1);
+    s=new Date(now.getFullYear()+offset, 0, 1);
+    e=new Date(now.getFullYear()+offset+1, 0, 1);
   }
   return{s,e};
+}
+
+function updateNavLabel() {
+  const rng = range(period);
+  const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio',
+                 'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  let label = '';
+  if(period==='week'){
+    const s=rng.s, e=new Date(rng.e); e.setDate(e.getDate()-1);
+    label = `${s.getDate()} ${meses[s.getMonth()].slice(0,3)} – ${e.getDate()} ${meses[e.getMonth()].slice(0,3)} ${e.getFullYear()}`;
+  } else if(period==='month'){
+    label = `${meses[rng.s.getMonth()]} ${rng.s.getFullYear()}`;
+  } else {
+    label = `${rng.s.getFullYear()}`;
+  }
+  document.getElementById('nav-label').textContent = label;
+  // Deshabilitar "siguiente" si ya estamos en el período actual
+  document.getElementById('btn-next').disabled = offset >= 0;
+}
+
+function navigate(dir) {
+  offset += dir;
+  if(offset > 0) offset = 0; // no ir al futuro
+  updateNavLabel();
+  renderAll();
 }
 const pd=v=>{if(!v)return null;const d=new Date(v);return isNaN(d)?null:d;};
 const pad=n=>String(n).padStart(2,'0');
@@ -635,12 +671,13 @@ function showLogin(){
 function showApp(){
   document.getElementById('login-screen').style.display='none';
   document.getElementById('main-content').style.display='block';
+  updateNavLabel();
   if(currentAccount){
     document.getElementById('user-info').style.display='flex';
     document.getElementById('user-name').textContent=currentAccount.name||currentAccount.username;
   }
 }
-function setPeriod(p){if(p==='day')return;period=p;document.querySelectorAll('[data-p]').forEach(b=>b.classList.toggle('active',b.dataset.p===p));renderAll();}
+function setPeriod(p){if(p==='day')return;period=p;offset=0;document.querySelectorAll('[data-p]').forEach(b=>b.classList.toggle('active',b.dataset.p===p));updateNavLabel();renderAll();}
 
 
 /* ══════════════════════════════════════
