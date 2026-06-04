@@ -180,7 +180,7 @@ main{position:relative;z-index:1;padding:1.75rem 2rem;max-width:1440px;margin:0 
   <!-- KPIs -->
   <div class="kpi-row">
     <div class="kpi-card kpi-c-total"><div class="kpi-tag">Total registros</div><div class="kpi-val" id="k-total">—</div><div class="kpi-foot">Hoja CT</div></div>
-    <div class="kpi-card kpi-c-elab"><div class="kpi-tag">Entregados</div><div class="kpi-val" id="k-elab">—</div><div class="kpi-foot">Estado = Entregado</div></div>
+    <div class="kpi-card kpi-c-elab"><div class="kpi-tag">Entregados</div><div class="kpi-val" id="k-elab">—</div><div class="kpi-foot">Estado = ENTREGADO</div></div>
     <div class="kpi-card kpi-c-pend"><div class="kpi-tag">Pendientes</div><div class="kpi-val" id="k-pend">—</div><div class="kpi-foot">Estado = Pendiente</div></div>
     <div class="kpi-card kpi-c-ing"><div class="kpi-tag">Ingresos en período</div><div class="kpi-val" id="k-ing">—</div><div class="kpi-foot" id="k-ing-foot">Esta semana</div></div>
     <div class="kpi-card kpi-c-exit"><div class="kpi-tag">Pruebas exitosas</div><div class="kpi-val" id="k-exit">—</div><div class="kpi-foot">% sobre total pruebas</div></div>
@@ -473,7 +473,7 @@ function renderAll(){
 
 function renderKPIs(){
   const total = rows.length;
-  const entregados = rows.filter(r=>r.estado==='Entregado').length;
+  const entregados = rows.filter(r=>r.estado==='ENTREGADO').length;
   const pendientes = rows.filter(r=>r.estado==='Pendiente').length;
   const rng = range(period);
   const ing = rows.filter(r=>r.fechaDate&&r.fechaDate>=rng.s&&r.fechaDate<rng.e).length;
