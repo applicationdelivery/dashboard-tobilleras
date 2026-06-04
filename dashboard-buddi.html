@@ -408,13 +408,17 @@ async function fetchExcel(){
 function parseRows(values){
   if(!values || values.length<2) return [];
   const headers = values[0].map(h=>String(h||'').trim());
+  console.log('=== ENCABEZADOS EXCEL ===', headers);
 
   // Construir índice de columnas
   colIndex = {};
   Object.entries(COL).forEach(([k,v])=>{
     const idx = headers.indexOf(v);
     if(idx>=0) colIndex[k]=idx;
+    else console.warn(`Columna NO encontrada: "${v}"`);
   });
+  console.log('=== COLUMNAS MAPEADAS ===', colIndex);
+  console.log('=== PRIMERA FILA DE DATOS ===', values[1]);
 
   return values.slice(1).map(row=>{
     const obj={};
