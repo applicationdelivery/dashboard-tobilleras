@@ -254,7 +254,7 @@ const CLIENT_ID   = '0c41647e-99b4-4736-8702-4f72d94bc0f2';
 const REDIRECT    = 'https://applicationdelivery.github.io/dashboard-tobilleras/';
 const SITE_HOST   = 'sgsvsa.sharepoint.com';
 const SITE_PATH   = '/sites/CRITEC-Tobilleras';
-const FILE_PATH   = '/Documentos compartidos/Equipo para diagnostico BUDDI.xlsx';
+const FILE_ID     = '2446516a-84ef-4ce7-a315-f9e9f181168b'; // UniqueId del archivo en SharePoint
 const SHEET_NAME  = 'CT';
 const SCOPES      = ['https://graph.microsoft.com/Sites.Read.All','https://graph.microsoft.com/User.Read'];
 
@@ -345,14 +345,13 @@ let _driveId=null, _fileId=null;
 async function getFileIds(token){
   if(_driveId && _fileId) return;
 
-  // Obtener site ID primero
+  // Obtener site ID
   const r0 = await fetch(
     `https://graph.microsoft.com/v1.0/sites/${SITE_HOST}:${SITE_PATH}`,
     {headers:{'Authorization':'Bearer '+token}}
   );
   if(!r0.ok) throw new Error('No se pudo obtener el site: '+r0.status);
-  const site = await r0.json();
-  const siteId = site.id;
+  const siteId = (await r0.json()).id;
 
   // Obtener drive del sitio
   const r1 = await fetch(
@@ -360,22 +359,33 @@ async function getFileIds(token){
     {headers:{'Authorization':'Bearer '+token}}
   );
   if(!r1.ok) throw new Error('No se pudo acceder al drive: '+r1.status);
-  const d = await r1.json();
-  _driveId = d.id;
+  _driveId = (await r1.json()).id;
 
-  // Buscar el archivo — Graph API requiere cada segmento codificado individualmente
-  const folder = 'Documentos compartidos';
-  const file   = 'Equipo para diagnostico BUDDI.xlsx';
+  // Buscar por UniqueId de SharePoint via items search
   const r2 = await fetch(
-    `https://graph.microsoft.com/v1.0/drives/${_driveId}/root:/${encodeURIComponent(folder)}/${encodeURIComponent(file)}`,
+    `https://graph.microsoft.com/v1.0/drives/${_driveId}/items?$filter=id eq '${FILE_ID}'`,
     {headers:{'Authorization':'Bearer '+token}}
   );
-  if(!r2.ok) {
-    const err = await r2.json().catch(()=>({}));
-    throw new Error(`No se encontró el archivo (${r2.status}): ${err?.error?.message||r2.statusText}`);
+  // Graph no soporta filter por id directamente — buscar por sharepointIds
+  const r3 = await fetch(
+    `https://graph.microsoft.com/v1.0/sites/${siteId}/drive/items/${FILE_ID}`,
+    {headers:{'Authorization':'Bearer '+token}}
+  );
+  if(r3.ok){
+    _fileId = (await r3.json()).id;
+    return;
   }
-  const f = await r2.json();
-  _fileId = f.id;
+
+  // Fallback: listar carpeta y buscar por nombre
+  const r4 = await fetch(
+    `https://graph.microsoft.com/v1.0/drives/${_driveId}/root:/Documentos%20compartidos:/children`,
+    {headers:{'Authorization':'Bearer '+token}}
+  );
+  if(!r4.ok) throw new Error('No se pudo listar la carpeta: '+r4.status);
+  const items = (await r4.json()).value || [];
+  const found = items.find(i=>i.name==='Equipo para diagnostico BUDDI.xlsx');
+  if(!found) throw new Error('Archivo no encontrado en la carpeta Documentos compartidos.');
+  _fileId = found.id;
 }
 
 async function fetchExcel(){
