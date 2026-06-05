@@ -379,9 +379,30 @@ function parseRows(values){
     const raw=obj.fecha;
     if(raw){
       const n=parseFloat(raw);
-      obj.fechaDate=(!isNaN(n)&&n>40000)
-        ?new Date(Math.round((n-25569)*86400*1000))
-        :(()=>{const d=new Date(raw);return isNaN(d)?null:d;})();
+      if(!isNaN(n)&&n>40000){
+        // Número serial Excel → fecha local sin ajuste de zona horaria
+        // Excel cuenta desde 1900-01-01, pero tiene un bug del año 1900 bisiesto (+1)
+        const totalDays = Math.floor(n);
+        const ms = Math.round((n - totalDays) * 86400000);
+        // Construir fecha como local usando UTC days desde epoch
+        const utcMs = (totalDays - 25569) * 86400000 + ms;
+        const d = new Date(utcMs);
+        // Corregir offset de zona horaria para que quede como fecha local
+        obj.fechaDate = new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+      } else {
+        // String de fecha — parsear partes manualmente para evitar UTC
+        const parts = String(raw).split(/[\/\-]/);
+        if(parts.length===3){
+          // Detectar formato DD/MM/YYYY o MM/DD/YYYY o YYYY-MM-DD
+          const a=parseInt(parts[0]),b=parseInt(parts[1]),c=parseInt(parts[2]);
+          if(c>1900) obj.fechaDate=new Date(c,b-1,a); // DD/MM/YYYY
+          else if(a>1900) obj.fechaDate=new Date(a,b-1,c); // YYYY-MM-DD
+          else obj.fechaDate=new Date(c,a-1,b); // MM/DD/YYYY
+        } else {
+          const d=new Date(raw);
+          obj.fechaDate=isNaN(d)?null:new Date(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate());
+        }
+      }
     }else obj.fechaDate=null;
     return obj;
   }).filter(r=>r.bolsa);
